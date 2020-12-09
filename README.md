@@ -1,2 +1,2 @@
-# -Automated-Driving-Prediiction
+# Automated-Driving-Prediiction
 CPSC340 Group Final
