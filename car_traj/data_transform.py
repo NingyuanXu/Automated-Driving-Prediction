@@ -29,7 +29,7 @@ class dataTransform:
         # width: num of max features = 6
         dataset = np.empty((10, 10, 6), dtype=object)
         file_name = X_or_y + "_" + index + ".csv"
-        df = load_dataset(data_type="train", X_or_y="X", filename=file_name)
+        df = self.load_dataset(data_type="train", X_or_y="X", filename=file_name)
         X = df.values
         # A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
         agents = np.hsplit(X[:-1, 1:], 10)
