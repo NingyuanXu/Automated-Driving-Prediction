@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import os
-import car_traj_util
 
 
 class dataTransform:
@@ -44,6 +43,8 @@ class dataTransform:
         # initialize sample dataset
         dataset = np.empty((len(indices), len(time_step),
                             10, len(features)), dtype=object)
+        pred_dataset = np.empty((len(indices), len(time_step),
+                                 10, len(features)), dtype=object)
 
         # get the filter based on features, time_step
         height_filter = np.zeros(len(time_step)).astype(int)  # height filter
@@ -54,11 +55,20 @@ class dataTransform:
         for i in range(len(features)):
             width_filter[i] = self.feature_filter[features[i]]
 
+        pred_height_filter = np.zeros(len(time_step)).astype(int)  # height filter
+        for i in range(len(time_step)):
+            pred_height_filter[i] = int((1000+time_step[i])/100)
         for i in range(len(indices)):
             csv_model = self.initialize_model(index=indices[i], X_or_y=X_or_y)
+            # Get sample model
             buffer_model = csv_model[height_filter, :]
             result_model = buffer_model[:,:, width_filter]
-            dataset[i] =result_model
+            dataset[i] = result_model
+            # Get target pred sample model
+            pred_buffer_model = csv_model[pred_height_filter, :]
+            pred_result_model = pred_buffer_model[:, :, width_filter]
+            pred_dataset[i] = pred_result_model
+        return dataset, pred_dataset
 
     def load_dataset(self, data_type, X_or_y, filename):
         data_path = data_type
