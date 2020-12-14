@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
+import car_traj_util
 
 
 class dataTransform:
@@ -14,10 +15,20 @@ class dataTransform:
         """
         self.features = features
         self.data_type = data_type
-    
+        self.feature_filter = {
+            "id": 0,
+            "role": 1,
+            "type": 2,
+            "x": 3,
+            "y": 4,
+            "present": 5
+        }
 
     def initialize_model(self, index, X_or_y):
-        dataset = np.zeros((10,10,6)) # len(time_step) = 10, num of agents = 10, num of max features = 6   
+        # height: len(time_step) = 10,
+        # length: num of agents = 10,
+        # width: num of max features = 6
+        dataset = np.empty((10, 10, 6), dtype=object)
         file_name = X_or_y + "_" + index + ".csv"
         df = load_dataset(data_type="train", X_or_y="X", filename=file_name)
         X = df.values
@@ -30,18 +41,28 @@ class dataTransform:
         return dataset
 
     def get_sample(self, features, time_step, pred_time_step, indices, X_or_y):
-        dataset = np.zeros(len(indices))
+        # initialize sample dataset
+        dataset = np.empty((len(indices), len(time_step),
+                            10, len(features)), dtype=object)
+
+        # get the filter based on features, time_step
+        height_filter = np.zeros(len(time_step)).astype(int)  # height filter
+        for i in range(len(time_step)):
+            height_filter[i] = int((1000+time_step[i])/100)
+
+        width_filter = np.zeros(len(features)).astype(int)   # width filter
+        for i in range(len(features)):
+            width_filter[i] = self.feature_filter[features[i]]
+
         for i in range(len(indices)):
-            file_name = X_or_y +"_"+ index+ ".csv" # file name "X_0.csv"
-            df = self.load_dataset(data_type=self.data_type,
-                                   X_or_y=X_or_y, filename=file_name)
-            
-            
+            csv_model = self.initialize_model(index=indices[i], X_or_y=X_or_y)
+            buffer_model = csv_model[height_filter, :]
+            result_model = buffer_model[:,:, width_filter]
+            dataset[i] =result_model
 
     def load_dataset(self, data_type, X_or_y, filename):
         data_path = data_type
         X_or_y_path = X_or_y
         filename_path = filename
-        with open(os.path.join(".", "data", data_path,
-             X_or_y_path, filename_path), 'rb') as f:
+        with open(os.path.join(".", "data", data_path, X_or_y_path, filename_path), 'rb') as f:
             return pd.read_csv(f)
