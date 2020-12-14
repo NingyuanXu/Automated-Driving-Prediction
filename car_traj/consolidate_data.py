@@ -3,16 +3,19 @@ from os import listdir
 from os.path import join
 from tqdm import tqdm
 
+
 def main():
     print('consolidating train data')
-    consol_fold('./train') # your train data folder
+    consol_fold('./train')  # your train data folder
     print('\n')
     
     print('consolidating test data')
-    consol_fold('./val') # your test data folder
+    consol_fold('./val')  # your test data folder
+
 
 # consolidate all the data into one csv
-# the idx colum refers to which file it came from; you can change the name in for loop in the consol_data() function
+# the idx colum refers to which file it came from; you can c
+# hange the name in for loop in the consol_data() function
 def consol_fold(fold_path):
     X_path = fold_path + '/X/'
     Y_path = fold_path + '/y/'
@@ -22,12 +25,13 @@ def consol_fold(fold_path):
     df_X = consol_data(X_path)
     df_Y = consol_data(Y_path)
     
-    df_X.to_csv(join(savePath, 'features.csv'),index = False)
-    df_Y.to_csv(join(savePath, 'targets.csv'), index = False)
+    df_X.to_csv(join(savePath, 'features.csv'), index=False)
+    df_Y.to_csv(join(savePath, 'targets.csv'), index=False)
+
 
 def consol_data(path):
 
-    files = [join(path,f) for f in listdir(path)]
+    files = [join(path, f) for f in listdir(path)]
     
     files.reverse()
     
